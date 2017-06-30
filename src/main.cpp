@@ -190,7 +190,7 @@ int main(int argv, const char* argc[])
     if(!write_sprite_success)
         return std::printf("Unable to write sprite files.\n");
     
-    std::printf("Successfuly baked\n");
+    std::printf("Successfully baked\n");
     for(const std::string& file : context.input_files)
         std::printf("\t'%s'\n", file.c_str());
     
