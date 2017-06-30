@@ -1,0 +1,9 @@
+.DS_Store
+.vscode/*.VC.db
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+bin/
+build/
+CMakeFiles/
+DerivedData/

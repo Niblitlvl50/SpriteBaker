@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "C++ Launch game",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/bin/baker",
+            "args": [
+                "-width", "512",
+                "-height", "512",
+                "-input", "cat-walk-1.png", "cat-walk-2.png", "ken1.png", "ken2.png", "ken3.png"
+                "-output", "packed_image.png"
+                ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/res",
+            "environment": [],
+            "externalConsole": false,
+            "linux": {
+                "MIMode": "gdb"
+            },
+            "osx": {
+                "MIMode": "lldb"
+            },
+            "windows": {
+                "MIMode": "gdb"
+            }
+        }
+    ]
+}

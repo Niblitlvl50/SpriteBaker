@@ -1,0 +1,44 @@
+{
+    "python.linting.pylintEnabled": false,
+
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/.vscode": false,
+        "**/*.VC.db": true,
+        "bin/": true,
+        "CMakeFiles": true,
+        "cmake_install.cmake": true,
+        "CMakeCache.txt": true,
+        "Makefile": true
+    },
+    "files.associations": {
+        "ios": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "initializer_list": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "ratio": "cpp",
+        "__config": "cpp",
+        "cstddef": "cpp",
+        "exception": "cpp",
+        "new": "cpp",
+        "stdexcept": "cpp",
+        "typeinfo": "cpp",
+        "utility": "cpp",
+        "algorithm": "cpp",
+        "string_view": "cpp"
+    }
+}
