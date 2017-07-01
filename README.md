@@ -1,10 +1,25 @@
 # Baker
 
-Usage: baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png
+Usage
+```
+baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png
+```
 
-Required arguments:
-	-width, -height, -input, -output
+Arguments
 
-Optional arguments:
-	-bg_red [0 - 255], -bg_green [0 - 255], -bg_blue [0 - 255], -bg_alpha [0 - 255], -padding [ >= 0]
+*Required*
+```
+-width		Output image width.
+-height		Output image height.
+-input		A list of input images that will be packed into the output image.
+-output		The output image file name.
+```
 
+*Optional*
+```
+-bg_red		Red channel color value for the background, value between 0 and 255.
+-bg_green	Green channel color value for the background, value between 0 and 255.
+-bg_blue	Blue channel color value for the background, value between 0 and 255.
+-bg_alpha	Alpha channel color value for the background, value between 0 and 255.
+-padding	Padding around each sub image in pixels.
+```
