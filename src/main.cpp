@@ -141,9 +141,8 @@ void WriteImage(
 {
     // RGBA
     constexpr int color_components = 4;
-
-    std::vector<unsigned char> output_image_bytes;
-    output_image_bytes.resize(width * height * color_components);
+    const int image_size = width * height * color_components;
+    std::vector<unsigned char> output_image_bytes(image_size, 0);
 
     for(const stbrp_rect& rect : rects)
     {
