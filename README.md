@@ -1,6 +1,7 @@
 # Baker
 
 Usage: baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png
+
 Required arguments:
 	-width, -height, -input, -output
 
