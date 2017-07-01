@@ -1,5 +1,7 @@
 # Baker
 
+A simple tool for baking a bunch of images into one larger image. 
+
 Usage
 ```
 baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png
@@ -23,3 +25,8 @@ Arguments
 -bg_alpha	Alpha channel color value for the background, value between 0 and 255.
 -padding	Padding around each sub image in pixels.
 ```
+
+[input1]: https://github.com/Niblitlvl50/Baker/blob/master/res/cat-bump.png
+[input2]: https://github.com/Niblitlvl50/Baker/blob/master/res/cat-jump-1.png
+[input3]: https://github.com/Niblitlvl50/Baker/blob/master/res/cat-jump-2.png
+[baked_image]: https://github.com/Niblitlvl50/Baker/blob/master/res/baked_image.png
