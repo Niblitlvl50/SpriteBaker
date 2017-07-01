@@ -9,7 +9,6 @@
 
 #include <vector>
 #include <string>
-#include <memory>
 #include <cstdio>
 #include <unordered_map>
 
@@ -26,7 +25,7 @@ struct ImageData
     int width;
     int height;
     int channels;
-    std::unique_ptr<unsigned char> data;
+    std::vector<unsigned char> data;
 };
 
 bool ParseArguments(int argv, const char** argc, Context& context)
@@ -96,8 +95,12 @@ std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
             break;
         }
 
-        image.data.reset(data);
+        const int image_size = image.width * image.height * image.channels;
+        image.data.resize(image_size);
+        std::memcpy(image.data.data(), data, image_size);
         images.push_back(std::move(image));
+
+        stbi_image_free(data);
     }
 
     return images;
@@ -153,7 +156,7 @@ bool WriteImage(
             const int image_offset = index * image.width * color_components;
             const int bytes_to_copy = image.width * color_components;
 
-            std::memcpy(&output_image_bytes[output_offset], &image.data.get()[image_offset], bytes_to_copy);
+            std::memcpy(&output_image_bytes[output_offset], &image.data[image_offset], bytes_to_copy);
         }
     }
 
