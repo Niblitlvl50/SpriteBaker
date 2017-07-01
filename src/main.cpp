@@ -18,6 +18,7 @@ struct Context
     std::string output_file;
     int output_width;
     int output_height;
+    int padding = 0;
 };
 
 struct ImageData
@@ -51,11 +52,11 @@ void ParseArguments(int argv, const char** argc, Context& context)
         }
     }
 
-    auto width_it = options_table.find("width");
-    auto height_it = options_table.find("height");
-    auto input_it = options_table.find("input");
-    auto output_it = options_table.find("output");
-    auto end = options_table.end();
+    const auto width_it = options_table.find("width");
+    const auto height_it = options_table.find("height");
+    const auto input_it = options_table.find("input");
+    const auto output_it = options_table.find("output");
+    const auto end = options_table.end();
 
     if(width_it == end || height_it == end || input_it == end || output_it == end)
         throw std::runtime_error("Invalid arguments");
@@ -70,6 +71,10 @@ void ParseArguments(int argv, const char** argc, Context& context)
         context.input_files.push_back(token);
         data = nullptr;
     }
+
+    const auto padding_it = options_table.find("padding");
+    if(padding_it != options_table.end())
+        context.padding = std::stoi(padding_it->second);
 }
 
 std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
@@ -95,7 +100,7 @@ std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
     return images;
 }
 
-std::vector<stbrp_rect> PackImages(const std::vector<ImageData>& images, int width, int height)
+std::vector<stbrp_rect> PackImages(const std::vector<ImageData>& images, int width, int height, int padding)
 {
     std::vector<stbrp_rect> pack_rects;
     pack_rects.reserve(images.size());
@@ -106,8 +111,8 @@ std::vector<stbrp_rect> PackImages(const std::vector<ImageData>& images, int wid
 
         stbrp_rect rect;
         rect.id = index;
-        rect.w = image_data.width;
-        rect.h = image_data.height;
+        rect.w = image_data.width + padding * 2;
+        rect.h = image_data.height + padding * 2;
 
         pack_rects.push_back(rect);
     }
@@ -121,6 +126,12 @@ std::vector<stbrp_rect> PackImages(const std::vector<ImageData>& images, int wid
     const bool success = stbrp_pack_rects(&pack_context, pack_rects.data(), pack_rects.size()) != 0;
     if(!success)
         throw std::runtime_error("Unable to pack all images, consider a bigger output image.");
+
+    for(stbrp_rect& rect : pack_rects)
+    {
+        rect.x += padding;
+        rect.y += padding;
+    }
 
     return pack_rects;
 }
@@ -168,7 +179,7 @@ int main(int argv, const char* argc[])
     {
         ParseArguments(argv, argc, context);
         const std::vector<ImageData>& images = LoadImages(context.input_files);
-        const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height);
+        const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height, context.padding);
         WriteImage(images, rects, context.output_file, context.output_width, context.output_height);
         WriteSpriteFiles(rects);
     }
@@ -176,7 +187,7 @@ int main(int argv, const char* argc[])
     {
         std::printf("\n%s\n", error.what());
         std::printf("\n");
-        std::printf("Usage: baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png\n");
+        std::printf("Usage: baker -width 512 -height 512 -padding 4 -input [image1.png image1.png ...] -output sprite_atlas.png\n");
         std::printf("\n");
 
         return 1;

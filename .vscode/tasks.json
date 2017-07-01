@@ -30,6 +30,7 @@
                 "baker",
                 "-width 512",
                 "-height 512",
+                "-padding 12",
                 "-input cat-bump.png cat-jump-1.png cat-jump-2.png cat-jump-3.png cat-stand-1.png cat-stand-2.png cat-turn-1.png cat-walk-1.png cat-walk-2.png",
                 "-output baked_image.png"
                 ]
