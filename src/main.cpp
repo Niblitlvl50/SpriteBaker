@@ -24,7 +24,7 @@ struct ImageData
 {
     int width;
     int height;
-    int channels;
+    int color_components;
     std::vector<unsigned char> data;
 };
 
@@ -87,7 +87,7 @@ std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
     for(const std::string& file : image_files)
     {
         ImageData image;
-        stbi_uc* data = stbi_load(file.c_str(), &image.width, &image.height, &image.channels, 0);
+        stbi_uc* data = stbi_load(file.c_str(), &image.width, &image.height, &image.color_components, 0);
         if(!data)
         {
             std::printf("%s %s\n", stbi_failure_reason(), file.c_str());
@@ -95,7 +95,7 @@ std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
             break;
         }
 
-        const int image_size = image.width * image.height * image.channels;
+        const int image_size = image.width * image.height * image.color_components;
         image.data.resize(image_size);
         std::memcpy(image.data.data(), data, image_size);
         images.push_back(std::move(image));
