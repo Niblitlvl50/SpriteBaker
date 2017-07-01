@@ -28,7 +28,7 @@ struct ImageData
     std::vector<unsigned char> data;
 };
 
-bool ParseArguments(int argv, const char** argc, Context& context)
+void ParseArguments(int argv, const char** argc, Context& context)
 {
     std::unordered_map<std::string, std::string> options_table;
     std::string current_option;
@@ -58,12 +58,7 @@ bool ParseArguments(int argv, const char** argc, Context& context)
     auto end = options_table.end();
 
     if(width_it == end || height_it == end || input_it == end || output_it == end)
-    {
-        std::printf("\n");
-        std::printf("Usage: baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png\n");
-        std::printf("\n");
-        return false;
-    }
+        throw std::runtime_error("Invalid arguments");
 
     context.output_width = std::stoi(width_it->second);
     context.output_height = std::stoi(height_it->second);
@@ -75,8 +70,6 @@ bool ParseArguments(int argv, const char** argc, Context& context)
         context.input_files.push_back(token);
         data = nullptr;
     }
-
-    return !context.input_files.empty();
 }
 
 std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
@@ -89,11 +82,7 @@ std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
         ImageData image;
         stbi_uc* data = stbi_load(file.c_str(), &image.width, &image.height, &image.color_components, 0);
         if(!data)
-        {
-            std::printf("%s %s\n", stbi_failure_reason(), file.c_str());
-            images.clear();
-            break;
-        }
+            throw std::runtime_error(stbi_failure_reason() + std::string(" '") + file + "'");
 
         const int image_size = image.width * image.height * image.color_components;
         image.data.resize(image_size);
@@ -131,12 +120,12 @@ std::vector<stbrp_rect> PackImages(const std::vector<ImageData>& images, int wid
     stbrp_init_target(&pack_context, width, height, nodes.data(), nodes.size());
     const bool success = stbrp_pack_rects(&pack_context, pack_rects.data(), pack_rects.size()) != 0;
     if(!success)
-        pack_rects.clear();
+        throw std::runtime_error("Unable to pack all images, consider a bigger output image.");
 
     return pack_rects;
 }
 
-bool WriteImage(
+void WriteImage(
     const std::vector<ImageData>& images, const std::vector<stbrp_rect>& rects, const std::string& output_file, int width, int height)
 {
     // RGBA
@@ -161,7 +150,9 @@ bool WriteImage(
     }
 
     constexpr int stride = 0;
-    return stbi_write_png(output_file.c_str(), width, height, 4, output_image_bytes.data(), stride) != 0;
+    const bool success = stbi_write_png(output_file.c_str(), width, height, 4, output_image_bytes.data(), stride) != 0;
+    if(!success)
+        throw std::runtime_error("Unable to write output image");
 }
 
 bool WriteSpriteFiles(const std::vector<stbrp_rect>& rects)
@@ -173,26 +164,24 @@ int main(int argv, const char* argc[])
 {
     Context context;
 
-    const bool valid_arguments = ParseArguments(argv, argc, context);
-    if(!valid_arguments)
-        return std::printf("Invalid arguments.\n");
+    try
+    {
+        ParseArguments(argv, argc, context);
+        const std::vector<ImageData>& images = LoadImages(context.input_files);
+        const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height);
+        WriteImage(images, rects, context.output_file, context.output_width, context.output_height);
+        WriteSpriteFiles(rects);
+    }
+    catch(const std::runtime_error& error)
+    {
+        std::printf("\n%s\n", error.what());
+        std::printf("\n");
+        std::printf("Usage: baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png\n");
+        std::printf("\n");
 
-    const std::vector<ImageData>& images = LoadImages(context.input_files);
-    if(images.empty())
-        return std::printf("Unable to load images.\n");
+        return 1;
+    }
 
-    const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height);
-    if(rects.empty())
-        return std::printf("Unable to pack all images.\n");
-
-    const bool write_image_success = WriteImage(images, rects, context.output_file, context.output_width, context.output_height);
-    if(!write_image_success)
-        return std::printf("Unable to write output image.\n");
-
-    const bool write_sprite_success = WriteSpriteFiles(rects);
-    if(!write_sprite_success)
-        return std::printf("Unable to write sprite files.\n");
-    
     std::printf("Successfully baked\n");
     for(const std::string& file : context.input_files)
         std::printf("\t'%s'\n", file.c_str());
