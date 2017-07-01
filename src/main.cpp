@@ -7,6 +7,8 @@
 #include "stb_image_write.h"
 #include "stb_rect_pack.h"
 
+#include "json.hpp"
+
 #include <vector>
 #include <string>
 #include <cstdio>
@@ -19,6 +21,10 @@ struct Context
     int output_width;
     int output_height;
     int padding = 0;
+    unsigned char background_r = 0;
+    unsigned char background_g = 0;
+    unsigned char background_b = 0;
+    unsigned char background_a = 0;
 };
 
 struct ImageData
@@ -75,6 +81,22 @@ void ParseArguments(int argv, const char** argc, Context& context)
     const auto padding_it = options_table.find("padding");
     if(padding_it != options_table.end())
         context.padding = std::stoi(padding_it->second);
+
+    const auto red_it = options_table.find("bg_red");
+    if(red_it != end)
+        context.background_r = std::stoi(red_it->second);
+
+    const auto green_it = options_table.find("bg_green");
+    if(green_it != end)
+        context.background_g = std::stoi(green_it->second);
+
+    const auto blue_it = options_table.find("bg_blue");
+    if(blue_it != end)
+        context.background_b = std::stoi(blue_it->second);
+
+    const auto alpha_it = options_table.find("bg_alpha");
+    if(alpha_it != end)
+        context.background_a = std::stoi(alpha_it->second);
 }
 
 std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
@@ -137,12 +159,24 @@ std::vector<stbrp_rect> PackImages(const std::vector<ImageData>& images, int wid
 }
 
 void WriteImage(
-    const std::vector<ImageData>& images, const std::vector<stbrp_rect>& rects, const std::string& output_file, int width, int height)
+    const std::vector<ImageData>& images,
+    const std::vector<stbrp_rect>& rects,
+    const std::string& output_file,
+    int width, int height,
+    unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
 {
     // RGBA
     constexpr int color_components = 4;
     const int image_size = width * height * color_components;
     std::vector<unsigned char> output_image_bytes(image_size, 0);
+
+    for(size_t index = 0; index < output_image_bytes.size(); ++index)
+    {
+        output_image_bytes[index] = red;
+        output_image_bytes[++index] = green;
+        output_image_bytes[++index] = blue;
+        output_image_bytes[++index] = alpha;
+    }
 
     for(const stbrp_rect& rect : rects)
     {
@@ -167,6 +201,8 @@ void WriteImage(
 
 bool WriteSpriteFiles(const std::vector<stbrp_rect>& rects)
 {
+    nlohmann::json json;
+
     return true;
 }
 
@@ -179,14 +215,23 @@ int main(int argv, const char* argc[])
         ParseArguments(argv, argc, context);
         const std::vector<ImageData>& images = LoadImages(context.input_files);
         const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height, context.padding);
-        WriteImage(images, rects, context.output_file, context.output_width, context.output_height);
+        WriteImage(
+            images, rects,
+            context.output_file,
+            context.output_width, context.output_height,
+            context.background_r, context.background_g, context.background_b, context.background_a);
         WriteSpriteFiles(rects);
     }
     catch(const std::runtime_error& error)
     {
         std::printf("\n%s\n", error.what());
         std::printf("\n");
-        std::printf("Usage: baker -width 512 -height 512 -padding 4 -input [image1.png image1.png ...] -output sprite_atlas.png\n");
+        std::printf("Usage: baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png\n");
+        std::printf("Required arguments:\n");
+        std::printf("\t-width, -height, -input, -output\n");
+        std::printf("\n");
+        std::printf("Optional arguments:\n");
+        std::printf("\t-bg_red [0 - 255], -bg_green [0 - 255], -bg_blue [0 - 255], -bg_alpha [0 - 255], -padding [ >= 0]\n");
         std::printf("\n");
 
         return 1;
