@@ -34,4 +34,4 @@ baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_a
 
 ### Implementation
 
-This tools is build using [nothings stb libraries](https://github.com/nothings/stb), image reader/writer library as well as the rect packing library. Also for reading and writing json files I'm using [nlohmann's json library](https://github.com/nlohmann/json).
+This tools is build using [nothings stb libraries](https://github.com/nothings/stb), image reader/writer library as well as the rect packing library. For reading and writing json files [nlohmann's json library](https://github.com/nlohmann/json) is used.
