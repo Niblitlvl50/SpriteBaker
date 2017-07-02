@@ -112,11 +112,14 @@ std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
     for(const std::string& file : image_files)
     {
         ImageData image;
-        stbi_uc* data = stbi_load(file.c_str(), &image.width, &image.height, &image.color_components, 0);
+
+        // Force to 4 color components (RGBA).
+        constexpr int color_components = 4;
+        stbi_uc* data = stbi_load(file.c_str(), &image.width, &image.height, &image.color_components, color_components);
         if(!data)
             throw std::runtime_error(stbi_failure_reason() + std::string(" '") + file + "'");
 
-        const int image_size = image.width * image.height * image.color_components;
+        const int image_size = image.width * image.height * color_components;
         image.data.resize(image_size);
         std::memcpy(image.data.data(), data, image_size);
         images.push_back(std::move(image));
