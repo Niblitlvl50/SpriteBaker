@@ -1,0 +1,12 @@
+{
+    "frames": [
+        {
+            "h": 132,
+            "name": "cat-bump.png",
+            "w": 132,
+            "x": 276,
+            "y": 276
+        }
+    ],
+    "texture": "baked_image.png"
+}

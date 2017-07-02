@@ -1,0 +1,26 @@
+{
+    "frames": [
+        {
+            "h": 132,
+            "name": "cat-jump1.png",
+            "w": 132,
+            "x": 140,
+            "y": 4
+        },
+        {
+            "h": 132,
+            "name": "cat-jump2.png",
+            "w": 132,
+            "x": 276,
+            "y": 4
+        },
+        {
+            "h": 132,
+            "name": "cat-jump3.png",
+            "w": 132,
+            "x": 4,
+            "y": 140
+        }
+    ],
+    "texture": "baked_image.png"
+}

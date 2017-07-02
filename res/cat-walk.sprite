@@ -1,0 +1,19 @@
+{
+    "frames": [
+        {
+            "h": 132,
+            "name": "cat-walk1.png",
+            "w": 132,
+            "x": 140,
+            "y": 276
+        },
+        {
+            "h": 132,
+            "name": "cat-walk2.png",
+            "w": 132,
+            "x": 4,
+            "y": 4
+        }
+    ],
+    "texture": "baked_image.png"
+}

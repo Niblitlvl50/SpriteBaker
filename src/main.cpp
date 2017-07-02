@@ -13,13 +13,18 @@
 #include <string>
 #include <cstdio>
 #include <unordered_map>
+#include <fstream>
+#include <regex>
 
 struct Context
 {
+    // Required
     std::vector<std::string> input_files;
     std::string output_file;
     int output_width;
     int output_height;
+
+    // Optional arguments
     int padding = 0;
     unsigned char background_r = 0;
     unsigned char background_g = 0;
@@ -153,18 +158,18 @@ std::vector<stbrp_rect> PackImages(const std::vector<ImageData>& images, int wid
     {
         rect.x += padding;
         rect.y += padding;
+        rect.w -= padding;
+        rect.h -= padding;
     }
 
     return pack_rects;
 }
 
-void WriteImage(
-    const std::vector<ImageData>& images,
-    const std::vector<stbrp_rect>& rects,
-    const std::string& output_file,
-    int width, int height,
-    unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+void WriteImage(const std::vector<ImageData>& images, const std::vector<stbrp_rect>& rects, const Context& context)
 {
+    const int width = context.output_width;
+    const int height = context.output_height;
+
     // RGBA
     constexpr int color_components = 4;
     const int image_size = width * height * color_components;
@@ -172,10 +177,10 @@ void WriteImage(
 
     for(size_t index = 0; index < output_image_bytes.size(); ++index)
     {
-        output_image_bytes[index] = red;
-        output_image_bytes[++index] = green;
-        output_image_bytes[++index] = blue;
-        output_image_bytes[++index] = alpha;
+        output_image_bytes[index] = context.background_r;
+        output_image_bytes[++index] = context.background_g;
+        output_image_bytes[++index] = context.background_b;
+        output_image_bytes[++index] = context.background_a;
     }
 
     for(const stbrp_rect& rect : rects)
@@ -194,16 +199,55 @@ void WriteImage(
     }
 
     constexpr int stride = 0;
-    const bool success = stbi_write_png(output_file.c_str(), width, height, 4, output_image_bytes.data(), stride) != 0;
+    const bool success = stbi_write_png(context.output_file.c_str(), width, height, 4, output_image_bytes.data(), stride) != 0;
     if(!success)
         throw std::runtime_error("Unable to write output image");
 }
 
-bool WriteSpriteFiles(const std::vector<stbrp_rect>& rects)
+void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& context)
 {
-    nlohmann::json json;
+    const std::regex filename_matcher("(\\S*?)([\\d]+)?\\.");
+    std::unordered_map<std::string, std::vector<size_t>> sprite_files;
 
-    return true;
+    for(size_t index = 0; index < context.input_files.size(); ++index)
+    {
+        const std::string& file = context.input_files[index];
+
+        std::smatch match_result;
+        if(!std::regex_search(file, match_result, filename_matcher))
+            continue;
+
+        const std::string& filename_capture = match_result[1];
+        //const std::string& integer_capture = match_result[2];
+        //std::printf("%s %s\n", filename_capture.c_str(), integer_capture.c_str());
+
+        std::vector<size_t>& frame_ids = sprite_files[filename_capture];
+        frame_ids.push_back(index);
+    }
+    
+    for(const auto& pair : sprite_files)
+    {
+        nlohmann::json json;
+
+        json["texture"] = context.output_file;
+        nlohmann::json& frames = json["frames"];
+
+        for(size_t frame_index : pair.second)
+        {
+            const stbrp_rect& rect = rects[frame_index];
+
+            nlohmann::json object;
+            object["name"] = context.input_files[rect.id];
+            object["x"] = rect.x;
+            object["y"] = rect.y;
+            object["w"] = rect.w;
+            object["h"] = rect.h;
+            frames.push_back(object);
+        }
+
+        std::ofstream out_file(pair.first + ".sprite");
+        out_file << std::setw(4) << json << std::endl;
+    }
 }
 
 int main(int argv, const char* argc[])
@@ -215,16 +259,12 @@ int main(int argv, const char* argc[])
         ParseArguments(argv, argc, context);
         const std::vector<ImageData>& images = LoadImages(context.input_files);
         const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height, context.padding);
-        WriteImage(
-            images, rects,
-            context.output_file,
-            context.output_width, context.output_height,
-            context.background_r, context.background_g, context.background_b, context.background_a);
-        WriteSpriteFiles(rects);
+        WriteImage(images, rects, context);
+        WriteSpriteFiles(rects, context);
     }
     catch(const std::runtime_error& error)
     {
-        std::printf("\n%s\n", error.what());
+        std::printf("\nError: %s\n", error.what());
         std::printf("\n");
         std::printf("Usage: baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png\n");
         std::printf("Required arguments:\n");

@@ -1,0 +1,19 @@
+{
+    "frames": [
+        {
+            "h": 132,
+            "name": "cat-stand1.png",
+            "w": 132,
+            "x": 140,
+            "y": 140
+        },
+        {
+            "h": 132,
+            "name": "cat-stand2.png",
+            "w": 132,
+            "x": 276,
+            "y": 140
+        }
+    ],
+    "texture": "baked_image.png"
+}
