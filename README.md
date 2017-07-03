@@ -19,10 +19,7 @@ baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_a
 
 *Optional*
 ```
--bg_red         Red channel color value for the background, value between 0 and 255.
--bg_green       Green channel color value for the background, value between 0 and 255.
--bg_blue        Blue channel color value for the background, value between 0 and 255.
--bg_alpha       Alpha channel color value for the background, value between 0 and 255.
+-bg_color       Red, green, blue, alpha channel color values for the background, value between 0 and 255.
 -padding        Padding around each sub image in pixels.
 -trim_images    Trim fully transparent pixels in the input images.
 -sprite_format  Output special sprite format. 
