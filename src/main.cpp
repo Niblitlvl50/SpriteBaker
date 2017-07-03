@@ -30,6 +30,8 @@ struct Context
     unsigned char background_g = 0;
     unsigned char background_b = 0;
     unsigned char background_a = 0;
+    bool trim_images = false;
+    bool write_sprite_format = false;
 };
 
 struct ImageData
@@ -52,6 +54,7 @@ void ParseArguments(int argv, const char** argc, Context& context)
         {
             current_option = arg;
             current_option.erase(0, 1);
+            options_table[current_option];
         }
         else
         {
@@ -102,9 +105,30 @@ void ParseArguments(int argv, const char** argc, Context& context)
     const auto alpha_it = options_table.find("bg_alpha");
     if(alpha_it != end)
         context.background_a = std::stoi(alpha_it->second);
+
+    context.trim_images = (options_table.find("trim_images") != end);
+    context.write_sprite_format = (options_table.find("sprite_format") != end);
 }
 
-std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
+void TrimImage(ImageData& image)
+{
+    size_t first_non_transparent = image.data.size();
+    size_t last_non_transparent = 0;
+
+    for(size_t index = 0; index < image.data.size(); ++index)
+    {
+        const char c = image.data[index];
+        if(c != 0)
+        {
+            first_non_transparent = std::min(first_non_transparent, index);
+            last_non_transparent = std::max(last_non_transparent, index);
+        }
+    }
+
+    const float start_rows_to_erase = first_non_transparent % image.width;
+}
+
+std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files, bool trim_images)
 {
     std::vector<ImageData> images;
     images.reserve(image_files.size());
@@ -122,8 +146,11 @@ std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files)
         const int image_size = image.width * image.height * color_components;
         image.data.resize(image_size);
         std::memcpy(image.data.data(), data, image_size);
-        images.push_back(std::move(image));
 
+        if(trim_images)
+            TrimImage(image);
+
+        images.push_back(std::move(image));
         stbi_image_free(data);
     }
 
@@ -253,6 +280,67 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
     }
 }
 
+void WriteGenericJson(const std::vector<stbrp_rect>& rects, const Context& context)
+{
+    nlohmann::json frames;
+
+    for(const stbrp_rect& rect : rects)
+    {
+        nlohmann::json frame;
+        frame["x"] = rect.x;
+        frame["y"] = rect.y;
+        frame["w"] = rect.w;
+        frame["h"] = rect.h;
+
+        nlohmann::json pivot;
+        pivot["x"] = 0.5f;
+        pivot["y"] = 0.5f;
+
+        nlohmann::json source_size;
+        source_size["w"] = rect.w;
+        source_size["h"] = rect.h;
+
+        nlohmann::json sprite_source_size;
+        sprite_source_size["x"] = 0;
+        sprite_source_size["y"] = 0;
+        sprite_source_size["w"] = rect.w;
+        sprite_source_size["h"] = rect.h;
+
+        nlohmann::json object;
+        object["filename"] = context.input_files[rect.id];
+        object["rotated"] = false;
+        object["trimmed"] = false;
+        object["frame"] = frame;
+        object["pivot"] = pivot;
+        object["sourceSize"] = source_size;
+        object["spriteSourceSize"] = sprite_source_size;
+
+        frames.push_back(object);
+    }
+
+    nlohmann::json output_size;
+    output_size["w"] = context.output_width;
+    output_size["h"] = context.output_height;
+
+    nlohmann::json meta;
+    meta["app"]     = "https://github.com/Niblitlvl50/Baker";
+    meta["version"] = "1.0";
+    meta["image"]   = context.output_file;
+    meta["format"]  = "RGBA8888";
+    meta["size"]    = output_size;
+    meta["scale"]   = "1";
+
+    nlohmann::json json;
+    json["frames"]  = frames;
+    json["meta"]    = meta;
+
+    const size_t dot_pos = context.output_file.find_last_of(".");
+    const std::string& json_filename = context.output_file.substr(0, dot_pos) + ".json";
+
+    std::ofstream out_file(json_filename);
+    out_file << std::setw(4) << json << std::endl;
+}
+
 int main(int argv, const char* argc[])
 {
     Context context;
@@ -260,10 +348,10 @@ int main(int argv, const char* argc[])
     try
     {
         ParseArguments(argv, argc, context);
-        const std::vector<ImageData>& images = LoadImages(context.input_files);
+        const std::vector<ImageData>& images = LoadImages(context.input_files, context.trim_images);
         const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height, context.padding);
+        context.write_sprite_format ? WriteSpriteFiles(rects, context) : WriteGenericJson(rects, context);
         WriteImage(images, rects, context);
-        WriteSpriteFiles(rects, context);
     }
     catch(const std::runtime_error& error)
     {
@@ -274,7 +362,7 @@ int main(int argv, const char* argc[])
         std::printf("\t-width, -height, -input, -output\n");
         std::printf("\n");
         std::printf("Optional arguments:\n");
-        std::printf("\t-bg_red [0 - 255], -bg_green [0 - 255], -bg_blue [0 - 255], -bg_alpha [0 - 255], -padding [ >= 0]\n");
+        std::printf("\t-bg_red [0 - 255], -bg_green [0 - 255], -bg_blue [0 - 255], -bg_alpha [0 - 255], -padding [ >= 0], -trim_images [flag], -sprite_format [flag]\n");
         std::printf("\n");
 
         return 1;

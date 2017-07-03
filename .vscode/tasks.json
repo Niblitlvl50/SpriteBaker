@@ -35,9 +35,11 @@
                 "-bg_green 0",
                 "-bg_blue 255",
                 "-bg_alpha 255",
+                "-trim_images",
+                "-sprite_format",
                 "-input cat-bump.png cat-jump1.png cat-jump2.png cat-jump3.png cat-stand1.png cat-stand2.png cat-turn1.png cat-walk1.png cat-walk2.png",
                 "-output baked_image.png"
-                ]
+            ]
         }
     ]
 }
