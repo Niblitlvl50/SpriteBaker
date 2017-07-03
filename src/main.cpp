@@ -90,21 +90,17 @@ void ParseArguments(int argv, const char** argc, Context& context)
     if(padding_it != options_table.end())
         context.padding = std::stoi(padding_it->second);
 
-    const auto red_it = options_table.find("bg_red");
-    if(red_it != end)
-        context.background_r = std::stoi(red_it->second);
+    const auto bg_color_it = options_table.find("bg_color");
+    if(bg_color_it != end)
+    {
+        int red, green, blue, alpha = 0;
+        std::istringstream(bg_color_it->second) >> red >> green >> blue >> alpha;
 
-    const auto green_it = options_table.find("bg_green");
-    if(green_it != end)
-        context.background_g = std::stoi(green_it->second);
-
-    const auto blue_it = options_table.find("bg_blue");
-    if(blue_it != end)
-        context.background_b = std::stoi(blue_it->second);
-
-    const auto alpha_it = options_table.find("bg_alpha");
-    if(alpha_it != end)
-        context.background_a = std::stoi(alpha_it->second);
+        context.background_r = red;
+        context.background_g = green;
+        context.background_b = blue;
+        context.background_a = alpha;
+    }
 
     context.trim_images = (options_table.find("trim_images") != end);
     context.write_sprite_format = (options_table.find("sprite_format") != end);

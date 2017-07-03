@@ -9,7 +9,8 @@
             "args": [
                 "-width", "512",
                 "-height", "512",
-                "-input", "cat-walk-1.png", "cat-walk-2.png", "ken1.png", "ken2.png", "ken3.png"
+                "-bg_color 255 0 255 255",
+                "-input", "cat-walk-1.png", "cat-walk-2.png", "ken1.png", "ken2.png", "ken3.png",
                 "-output", "packed_image.png"
                 ],
             "stopAtEntry": false,
