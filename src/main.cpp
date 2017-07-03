@@ -79,12 +79,10 @@ void ParseArguments(int argv, const char** argc, Context& context)
     context.output_height = std::stoi(height_it->second);
     context.output_file = output_it->second;
 
-    char* data = &input_it->second.front();
-    while(const char* token = std::strtok(data, " "))
-    {
-        context.input_files.push_back(token);
-        data = nullptr;
-    }
+    std::string temp;
+    std::istringstream input_stream(input_it->second);
+    while(input_stream >> temp)
+        context.input_files.push_back(temp);
 
     const auto padding_it = options_table.find("padding");
     if(padding_it != options_table.end())
