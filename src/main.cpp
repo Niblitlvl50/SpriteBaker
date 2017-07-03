@@ -358,7 +358,7 @@ int main(int argv, const char* argc[])
         std::printf("\t-width, -height, -input, -output\n");
         std::printf("\n");
         std::printf("Optional arguments:\n");
-        std::printf("\t-bg_red [0 - 255], -bg_green [0 - 255], -bg_blue [0 - 255], -bg_alpha [0 - 255], -padding [ >= 0], -trim_images [flag], -sprite_format [flag]\n");
+        std::printf("\t-bg_color [r g b a, 0 - 255], -padding [ >= 0], -trim_images [flag], -sprite_format [flag]\n");
         std::printf("\n");
 
         return 1;
