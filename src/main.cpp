@@ -107,9 +107,15 @@ void ParseArguments(int argv, const char** argc, Context& context)
 
 void TrimImage(ImageData& image)
 {
+    const int width_in_bytes = image.width * 4;
+
     int first_non_transparent = std::numeric_limits<int>::max();
     int last_non_transparent = 0;
 
+    int left_non_transparent = std::numeric_limits<int>::max();
+    int right_non_transparent = 0;
+
+    // First alpha component is at index 3 and the stride to next is 4
     for(int index = 3; index < image.data.size(); index += 4)
     {
         const unsigned char alpha = image.data[index];
@@ -117,26 +123,35 @@ void TrimImage(ImageData& image)
         {
             first_non_transparent = std::min(first_non_transparent, index);
             last_non_transparent = std::max(last_non_transparent, index);
+
+            const int current_row = index / width_in_bytes;
+            const int row_index = index - current_row * width_in_bytes;
+
+            left_non_transparent = std::min(left_non_transparent, row_index);
+            right_non_transparent = std::max(right_non_transparent, row_index);
         }
     }
 
-    const int width_in_bytes = image.width * 4;
-
-    // Top
     const int top_rows_to_delete = first_non_transparent / width_in_bytes;
-    const int index_of_byte = top_rows_to_delete * image.width * 4;
-
-    image.data.erase(image.data.begin(), image.data.begin() + index_of_byte);
-    image.height = image.height - top_rows_to_delete;
-
-    // Bottom
-
-    last_non_transparent -= first_non_transparent;
-
     const int bottom_rows_to_delete = image.height - (last_non_transparent / width_in_bytes) -1;
-    const int index_of_bottom_byte = bottom_rows_to_delete * image.width * 4;
-    image.data.erase(image.data.begin() + index_of_bottom_byte, image.data.end());
-    image.height = image.height - bottom_rows_to_delete;
+
+    const int bytes_to_copy = right_non_transparent - left_non_transparent + 4;
+
+    ImageData trimmed_image;
+    trimmed_image.width = bytes_to_copy / 4;
+    trimmed_image.height = image.height - top_rows_to_delete - bottom_rows_to_delete;
+    trimmed_image.data.resize(trimmed_image.width * trimmed_image.height * 4);
+
+    for(int row = 0; row < trimmed_image.height; ++row)
+    {
+        const int destination_offset = row * trimmed_image.width * 4;
+        const int source_offset = (row + top_rows_to_delete) * width_in_bytes;
+        void* dest = trimmed_image.data.data() + destination_offset;
+        const void* src = image.data.data() + source_offset + left_non_transparent -3;
+        std::memcpy(dest, src, bytes_to_copy);
+    }
+
+    image = std::move(trimmed_image);
 }
 
 std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files, bool trim_images)
