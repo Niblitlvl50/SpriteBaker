@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <regex>
+#include <limits>
 
 struct Context
 {
@@ -106,20 +107,36 @@ void ParseArguments(int argv, const char** argc, Context& context)
 
 void TrimImage(ImageData& image)
 {
-    size_t first_non_transparent = image.data.size();
-    size_t last_non_transparent = 0;
+    int first_non_transparent = std::numeric_limits<int>::max();
+    int last_non_transparent = 0;
 
-    for(size_t index = 0; index < image.data.size(); ++index)
+    for(int index = 3; index < image.data.size(); index += 4)
     {
-        const char c = image.data[index];
-        if(c != 0)
+        const unsigned char alpha = image.data[index];
+        if(alpha != 0)
         {
             first_non_transparent = std::min(first_non_transparent, index);
             last_non_transparent = std::max(last_non_transparent, index);
         }
     }
 
-    const float start_rows_to_erase = first_non_transparent % image.width;
+    const int width_in_bytes = image.width * 4;
+
+    // Top
+    const int top_rows_to_delete = first_non_transparent / width_in_bytes;
+    const int index_of_byte = top_rows_to_delete * image.width * 4;
+
+    image.data.erase(image.data.begin(), image.data.begin() + index_of_byte);
+    image.height = image.height - top_rows_to_delete;
+
+    // Bottom
+
+    last_non_transparent -= first_non_transparent;
+
+    const int bottom_rows_to_delete = image.height - (last_non_transparent / width_in_bytes) -1;
+    const int index_of_bottom_byte = bottom_rows_to_delete * image.width * 4;
+    image.data.erase(image.data.begin() + index_of_bottom_byte, image.data.end());
+    image.height = image.height - bottom_rows_to_delete;
 }
 
 std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files, bool trim_images)
