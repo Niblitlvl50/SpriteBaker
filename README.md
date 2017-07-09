@@ -31,6 +31,8 @@ Here's two outputs from the tool. The first one is 650 x 650 without trimming an
 
 <img src="https://github.com/Niblitlvl50/Baker/blob/master/res/baked_image.png" width="256" /> <img src="https://github.com/Niblitlvl50/Baker/blob/master/res/baked_image_trimmed.png" width="256 /">
 
+* [Link to json file](https://github.com/Niblitlvl50/Baker/blob/master/res/baked_image.json)
+* [Link to trimmed json file](https://github.com/Niblitlvl50/Baker/blob/master/res/baked_image_trimmed.json)
 
 ### Implementation
 
