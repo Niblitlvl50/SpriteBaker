@@ -351,7 +351,7 @@ void WriteGenericJson(const std::vector<stbrp_rect>& rects, const Context& conte
     output_size["h"] = context.output_height;
 
     nlohmann::json meta;
-    meta["app"]     = "https://github.com/Niblitlvl50/Baker";
+    meta["app"]     = "https://github.com/Niblitlvl50/SpriteBaker";
     meta["version"] = "1.0";
     meta["image"]   = context.output_file;
     meta["format"]  = "RGBA8888";
@@ -391,7 +391,7 @@ int main(int argv, const char* argc[])
     {
         std::printf("\nError: %s\n", error.what());
         std::printf("\n");
-        std::printf("Usage: baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png\n");
+        std::printf("Usage: spritebaker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png\n");
         std::printf("Required arguments:\n");
         std::printf("\t-width, -height, -input, -output\n");
         std::printf("\n");
