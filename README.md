@@ -1,4 +1,4 @@
-# Baker
+# Sprite Baker
 
 A simple tool for baking a bunch of images into one larger image. 
 
@@ -25,10 +25,11 @@ baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_a
 -sprite_format  Output special sprite format. 
 ```
 
-[input1]: https://github.com/Niblitlvl50/Baker/blob/master/res/cat-bump.png
-[input2]: https://github.com/Niblitlvl50/Baker/blob/master/res/cat-jump-1.png
-[input3]: https://github.com/Niblitlvl50/Baker/blob/master/res/cat-jump-2.png
-[baked_image]: https://github.com/Niblitlvl50/Baker/blob/master/res/baked_image.png
+# Example
+
+Here's two outputs from the tool. The first one is 650 x 650 without trimming and the second one is 512 x 512 with trimming. 
+
+<img src="https://github.com/Niblitlvl50/Baker/blob/master/res/baked_image.png" width="256" /> <img src="https://github.com/Niblitlvl50/Baker/blob/master/res/baked_image_trimmed.png" width="256 /">
 
 
 ### Implementation
