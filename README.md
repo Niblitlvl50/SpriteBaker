@@ -1,6 +1,6 @@
 # Sprite Baker
 
-A simple tool for baking a bunch of images into one larger image. 
+A simple tool for baking a bunch of images into one larger image. Will write a sprite atlas and a json file that tells you where the sub images are. 
 
 ### Usage
 ```
