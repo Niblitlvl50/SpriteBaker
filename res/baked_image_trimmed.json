@@ -3,10 +3,10 @@
         {
             "filename": "cat-bump.png",
             "frame": {
-                "h": 201,
-                "w": 201,
-                "x": 405,
-                "y": 405
+                "h": 100,
+                "w": 108,
+                "x": 313,
+                "y": 243
             },
             "pivot": {
                 "x": 0.5,
@@ -14,12 +14,12 @@
             },
             "rotated": false,
             "sourceSize": {
-                "h": 201,
-                "w": 201
+                "h": 100,
+                "w": 108
             },
             "spriteSourceSize": {
-                "h": 201,
-                "w": 201,
+                "h": 100,
+                "w": 108,
                 "x": 0,
                 "y": 0
             },
@@ -28,10 +28,10 @@
         {
             "filename": "cat-jump1.png",
             "frame": {
-                "h": 201,
-                "w": 201,
-                "x": 203,
-                "y": 1
+                "h": 111,
+                "w": 107,
+                "x": 204,
+                "y": 123
             },
             "pivot": {
                 "x": 0.5,
@@ -39,12 +39,12 @@
             },
             "rotated": false,
             "sourceSize": {
-                "h": 201,
-                "w": 201
+                "h": 111,
+                "w": 107
             },
             "spriteSourceSize": {
-                "h": 201,
-                "w": 201,
+                "h": 111,
+                "w": 107,
                 "x": 0,
                 "y": 0
             },
@@ -53,10 +53,10 @@
         {
             "filename": "cat-jump2.png",
             "frame": {
-                "h": 201,
-                "w": 201,
-                "x": 405,
-                "y": 1
+                "h": 110,
+                "w": 108,
+                "x": 204,
+                "y": 235
             },
             "pivot": {
                 "x": 0.5,
@@ -64,12 +64,12 @@
             },
             "rotated": false,
             "sourceSize": {
-                "h": 201,
-                "w": 201
+                "h": 110,
+                "w": 108
             },
             "spriteSourceSize": {
-                "h": 201,
-                "w": 201,
+                "h": 110,
+                "w": 108,
                 "x": 0,
                 "y": 0
             },
@@ -78,133 +78,8 @@
         {
             "filename": "cat-jump3.png",
             "frame": {
-                "h": 201,
-                "w": 201,
-                "x": 1,
-                "y": 203
-            },
-            "pivot": {
-                "x": 0.5,
-                "y": 0.5
-            },
-            "rotated": false,
-            "sourceSize": {
-                "h": 201,
-                "w": 201
-            },
-            "spriteSourceSize": {
-                "h": 201,
-                "w": 201,
-                "x": 0,
-                "y": 0
-            },
-            "trimmed": false
-        },
-        {
-            "filename": "cat-stand1.png",
-            "frame": {
-                "h": 201,
-                "w": 201,
-                "x": 203,
-                "y": 203
-            },
-            "pivot": {
-                "x": 0.5,
-                "y": 0.5
-            },
-            "rotated": false,
-            "sourceSize": {
-                "h": 201,
-                "w": 201
-            },
-            "spriteSourceSize": {
-                "h": 201,
-                "w": 201,
-                "x": 0,
-                "y": 0
-            },
-            "trimmed": false
-        },
-        {
-            "filename": "cat-stand2.png",
-            "frame": {
-                "h": 201,
-                "w": 201,
-                "x": 405,
-                "y": 203
-            },
-            "pivot": {
-                "x": 0.5,
-                "y": 0.5
-            },
-            "rotated": false,
-            "sourceSize": {
-                "h": 201,
-                "w": 201
-            },
-            "spriteSourceSize": {
-                "h": 201,
-                "w": 201,
-                "x": 0,
-                "y": 0
-            },
-            "trimmed": false
-        },
-        {
-            "filename": "cat-turn1.png",
-            "frame": {
-                "h": 201,
-                "w": 201,
-                "x": 1,
-                "y": 405
-            },
-            "pivot": {
-                "x": 0.5,
-                "y": 0.5
-            },
-            "rotated": false,
-            "sourceSize": {
-                "h": 201,
-                "w": 201
-            },
-            "spriteSourceSize": {
-                "h": 201,
-                "w": 201,
-                "x": 0,
-                "y": 0
-            },
-            "trimmed": false
-        },
-        {
-            "filename": "cat-walk1.png",
-            "frame": {
-                "h": 201,
-                "w": 201,
-                "x": 203,
-                "y": 405
-            },
-            "pivot": {
-                "x": 0.5,
-                "y": 0.5
-            },
-            "rotated": false,
-            "sourceSize": {
-                "h": 201,
-                "w": 201
-            },
-            "spriteSourceSize": {
-                "h": 201,
-                "w": 201,
-                "x": 0,
-                "y": 0
-            },
-            "trimmed": false
-        },
-        {
-            "filename": "cat-walk2.png",
-            "frame": {
-                "h": 201,
-                "w": 201,
+                "h": 125,
+                "w": 107,
                 "x": 1,
                 "y": 1
             },
@@ -214,12 +89,137 @@
             },
             "rotated": false,
             "sourceSize": {
-                "h": 201,
-                "w": 201
+                "h": 125,
+                "w": 107
             },
             "spriteSourceSize": {
-                "h": 201,
-                "w": 201,
+                "h": 125,
+                "w": 107,
+                "x": 0,
+                "y": 0
+            },
+            "trimmed": false
+        },
+        {
+            "filename": "cat-stand1.png",
+            "frame": {
+                "h": 120,
+                "w": 107,
+                "x": 326,
+                "y": 122
+            },
+            "pivot": {
+                "x": 0.5,
+                "y": 0.5
+            },
+            "rotated": false,
+            "sourceSize": {
+                "h": 120,
+                "w": 107
+            },
+            "spriteSourceSize": {
+                "h": 120,
+                "w": 107,
+                "x": 0,
+                "y": 0
+            },
+            "trimmed": false
+        },
+        {
+            "filename": "cat-stand2.png",
+            "frame": {
+                "h": 120,
+                "w": 108,
+                "x": 326,
+                "y": 1
+            },
+            "pivot": {
+                "x": 0.5,
+                "y": 0.5
+            },
+            "rotated": false,
+            "sourceSize": {
+                "h": 120,
+                "w": 108
+            },
+            "spriteSourceSize": {
+                "h": 120,
+                "w": 108,
+                "x": 0,
+                "y": 0
+            },
+            "trimmed": false
+        },
+        {
+            "filename": "cat-turn1.png",
+            "frame": {
+                "h": 120,
+                "w": 94,
+                "x": 109,
+                "y": 123
+            },
+            "pivot": {
+                "x": 0.5,
+                "y": 0.5
+            },
+            "rotated": false,
+            "sourceSize": {
+                "h": 120,
+                "w": 94
+            },
+            "spriteSourceSize": {
+                "h": 120,
+                "w": 94,
+                "x": 0,
+                "y": 0
+            },
+            "trimmed": false
+        },
+        {
+            "filename": "cat-walk1.png",
+            "frame": {
+                "h": 121,
+                "w": 108,
+                "x": 109,
+                "y": 1
+            },
+            "pivot": {
+                "x": 0.5,
+                "y": 0.5
+            },
+            "rotated": false,
+            "sourceSize": {
+                "h": 121,
+                "w": 108
+            },
+            "spriteSourceSize": {
+                "h": 121,
+                "w": 108,
+                "x": 0,
+                "y": 0
+            },
+            "trimmed": false
+        },
+        {
+            "filename": "cat-walk2.png",
+            "frame": {
+                "h": 121,
+                "w": 107,
+                "x": 218,
+                "y": 1
+            },
+            "pivot": {
+                "x": 0.5,
+                "y": 0.5
+            },
+            "rotated": false,
+            "sourceSize": {
+                "h": 121,
+                "w": 107
+            },
+            "spriteSourceSize": {
+                "h": 121,
+                "w": 107,
                 "x": 0,
                 "y": 0
             },
@@ -229,11 +229,11 @@
     "meta": {
         "app": "https://github.com/Niblitlvl50/Baker",
         "format": "RGBA8888",
-        "image": "baked_image.png",
+        "image": "baked_image_trimmed.png",
         "scale": "1",
         "size": {
-            "h": 650,
-            "w": 650
+            "h": 512,
+            "w": 512
         },
         "version": "1.0"
     }
