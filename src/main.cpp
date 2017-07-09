@@ -147,6 +147,8 @@ void TrimImage(ImageData& image)
         const int destination_offset = row * trimmed_image.width * 4;
         const int source_offset = (row + top_rows_to_delete) * width_in_bytes;
         void* dest = trimmed_image.data.data() + destination_offset;
+
+        // Figure out why -3, im 3 bytes off. :(
         const void* src = image.data.data() + source_offset + left_non_transparent -3;
         std::memcpy(dest, src, bytes_to_copy);
     }
