@@ -23,11 +23,11 @@
             "args": ["-c", "cmake ."]
         },
         {
-            "taskName": "baker",
+            "taskName": "run",
             "isTestCommand": true,
             "args": [
-                "./run_task.sh",
-                "baker",
+                "./.vscode/run_task.sh",
+                "spritebaker",
                 "-width 512",
                 "-height 512",
                 "-padding 4",
