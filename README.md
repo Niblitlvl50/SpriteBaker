@@ -4,7 +4,7 @@ A simple tool for baking a bunch of images into one larger image.
 
 ### Usage
 ```
-baker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png
+spritebaker -width 512 -height 512 -input [image1.png image1.png ...] -output sprite_atlas.png
 ```
 
 #### Arguments
