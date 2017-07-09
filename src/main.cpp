@@ -337,7 +337,7 @@ void WriteGenericJson(const std::vector<stbrp_rect>& rects, const Context& conte
         nlohmann::json object;
         object["filename"] = context.input_files[rect.id];
         object["rotated"] = false;
-        object["trimmed"] = false;
+        object["trimmed"] = context.trim_images;
         object["frame"] = frame;
         object["pivot"] = pivot;
         object["sourceSize"] = source_size;
