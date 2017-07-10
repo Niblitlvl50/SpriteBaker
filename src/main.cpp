@@ -132,6 +132,12 @@ void TrimImage(ImageData& image)
         }
     }
 
+    // Correct the byte index to start at the red component
+    first_non_transparent -= 3;
+    last_non_transparent -= 3;
+    left_non_transparent -= 3;
+    right_non_transparent -= 3;
+
     const size_t top_rows_to_delete = first_non_transparent / width_in_bytes;
     const size_t bottom_rows_to_delete = image.height - (last_non_transparent / width_in_bytes) -1;
 
@@ -147,9 +153,7 @@ void TrimImage(ImageData& image)
         const size_t destination_offset = row * trimmed_image.width * 4;
         const size_t source_offset = (row + top_rows_to_delete) * width_in_bytes;
         void* dest = trimmed_image.data.data() + destination_offset;
-
-        // Figure out why -3, im 3 bytes off. :(
-        const void* src = image.data.data() + source_offset + left_non_transparent -3;
+        const void* src = image.data.data() + source_offset + left_non_transparent;
         std::memcpy(dest, src, bytes_to_copy);
     }
 
