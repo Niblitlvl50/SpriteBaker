@@ -17,7 +17,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.0.1";
+constexpr const char* version = "1.1.0";
 
 struct Context
 {
@@ -281,6 +281,12 @@ void WriteImage(const std::vector<ImageData>& images, const std::vector<stbrp_re
 
 void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& context)
 {
+    std::string output_folder;
+
+    const size_t slash_pos = context.output_file.find_last_of('/');
+    if(slash_pos != std::string::npos)
+        output_folder = context.output_file.substr(0, slash_pos +1);
+
     const std::regex filename_matcher("(.+\\/)?(\\S*?)([\\d]+)?\\.");
     std::unordered_map<std::string, std::vector<size_t>> sprite_files;
 
@@ -324,9 +330,10 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
             frames.push_back(object);
         }
 
-        std::ofstream out_file(pair.first + ".sprite");
+        const std::string& sprite_file = output_folder + pair.first + ".sprite";
+        std::ofstream out_file(sprite_file);
         if(!out_file)
-            throw std::runtime_error("Unable to write to '" + pair.first + ".sprite'");
+            throw std::runtime_error("Unable to write to '" + sprite_file + "'");
 
         out_file << std::setw(4) << json << std::endl;
     }
