@@ -5,13 +5,13 @@
             "name": "C++ Launch game",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/bin/baker",
+            "program": "${workspaceRoot}/bin/spritebaker",
             "args": [
                 "-width", "512",
                 "-height", "512",
-                "-bg_color 255 0 255 255",
+                "-bg_color", "255 0 255 255",
                 "-trim_images",
-                "-input", "cat-walk1.png", "cat-walk2.png",
+                "-input", "res/cat-walk1.png res/cat-walk2.png",
                 "-output", "packed_image.png"
                 ],
             "stopAtEntry": false,

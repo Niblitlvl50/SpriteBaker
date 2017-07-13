@@ -1,41 +1,53 @@
 {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
-    "version": "0.1.0",
-    "command": "sh",
-    "suppressTaskName": true,
-    "isShellCommand": true,
-    "showOutput": "always",
+    "version": "2.0.0",
     "tasks": [
         {
             "taskName": "build",
-            "isBuildCommand": true,
-            "args": ["-c", "make -j8"]
+            "command": "make",
+            "args": [
+                "-j8"
+            ],
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         },
         {
             "taskName": "clean",
-            "isBuildCommand": false,
-            "args": ["-c", "make clean"]
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "type": "process"
         },
         {
             "taskName": "cmake",
-            "isBuildCommand": false,
-            "args": ["-c", "cmake ."]
+            "command": "cmake",
+            "args": [
+                "."
+            ],
+            "type": "process"
         },
         {
             "taskName": "run",
-            "isTestCommand": true,
+            "type": "process",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "command": "./bin/spritebaker",
             "args": [
-                "./.vscode/run_task.sh",
-                "spritebaker",
-                "-width 512",
-                "-height 512",
-                "-padding 4",
-                "-bg_color 255 0 255 255",
+                "-width", "512",
+                "-height", "512",
+                "-padding", "4",
+                "-bg_color", "255 0 255 255",
                 "-trim_images",
-                "-sprite_format",
-                "-input cat-bump.png cat-jump1.png cat-jump2.png cat-jump3.png cat-stand1.png cat-stand2.png cat-turn1.png cat-walk1.png cat-walk2.png",
-                "-output baked_image.png"
+//                "-sprite_format",
+                "-input", "res/cat-bump.png res/cat-jump1.png res/cat-jump2.png res/cat-jump3.png res/cat-stand1.png res/cat-stand2.png res/cat-turn1.png res/cat-walk1.png res/cat-walk2.png",
+                "-output", "baked_image.png"
             ]
         }
     ]
