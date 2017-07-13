@@ -73,8 +73,19 @@ void ParseArguments(int argv, const char** argc, Context& context)
     const auto output_it = options_table.find("output");
     const auto end = options_table.end();
 
-    if(width_it == end || height_it == end || input_it == end || output_it == end)
-        throw std::runtime_error("Invalid arguments");
+    const bool has_width = width_it != end && !width_it->second.empty();
+    const bool has_height = height_it != end && !height_it->second.empty();
+    const bool has_input = input_it != end && !input_it->second.empty();
+    const bool has_output = output_it != end && !output_it->second.empty();
+
+    if(!has_width)
+        throw std::runtime_error("Invalid arguments, missing valid 'width'.");
+    else if(!has_height)
+        throw std::runtime_error("Invalid arguments, missing valid 'height'.");
+    else if(!has_input)
+        throw std::runtime_error("Invalid arguments, missing valid 'input'.");
+    else if(!has_output)
+        throw std::runtime_error("Invalid arguments, missing valid 'output'.");
 
     context.output_width = std::stoi(width_it->second);
     context.output_height = std::stoi(height_it->second);
@@ -268,7 +279,7 @@ void WriteImage(const std::vector<ImageData>& images, const std::vector<stbrp_re
 
 void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& context)
 {
-    const std::regex filename_matcher("(\\S*?)([\\d]+)?\\.");
+    const std::regex filename_matcher("(.+?\\/)?(\\S*?)([\\d]+)?\\.");
     std::unordered_map<std::string, std::vector<size_t>> sprite_files;
 
     for(size_t index = 0; index < context.input_files.size(); ++index)
@@ -279,14 +290,18 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         if(!std::regex_search(file, match_result, filename_matcher))
             continue;
 
-        const std::string& filename_capture = match_result[1];
-        //const std::string& integer_capture = match_result[2];
-        //std::printf("%s %s\n", filename_capture.c_str(), integer_capture.c_str());
+        //const std::string& folder_capture = match_result[1];
+        const std::string& filename_capture = match_result[2];
+        //const std::string& integer_capture = match_result[3];
+        //std::printf("Folder: %s, file: %s, int: %s\n",
+        //    folder_capture.c_str(),
+        //    filename_capture.c_str(),
+        //    integer_capture.c_str());
 
         std::vector<size_t>& frame_ids = sprite_files[filename_capture];
         frame_ids.push_back(index);
     }
-    
+
     for(const auto& pair : sprite_files)
     {
         nlohmann::json json;
@@ -299,7 +314,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
             const stbrp_rect& rect = rects[frame_index];
 
             nlohmann::json object;
-            object["name"] = context.input_files[rect.id];
+            object["name"] = pair.first;
             object["x"] = rect.x;
             object["y"] = rect.y;
             object["w"] = rect.w;
@@ -400,7 +415,7 @@ int main(int argv, const char* argc[])
         std::printf("\t-width, -height, -input, -output\n");
         std::printf("\n");
         std::printf("Optional arguments:\n");
-        std::printf("\t-bg_color [r g b a, 0 - 255], -padding [ >= 0], -trim_images [flag], -sprite_format [flag]\n");
+        std::printf("\t-bg_color [r g b a, 0 - 255], -padding [>= 0], -trim_images [flag], -sprite_format [flag]\n");
         std::printf("\n");
 
         return 1;
