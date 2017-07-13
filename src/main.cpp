@@ -17,6 +17,8 @@
 #include <limits>
 #include <chrono>
 
+constexpr const char* version = "1.0.0";
+
 struct Context
 {
     // Required
@@ -416,6 +418,7 @@ int main(int argv, const char* argc[])
         std::printf("\n");
         std::printf("Optional arguments:\n");
         std::printf("\t-bg_color [r g b a, 0 - 255], -padding [>= 0], -trim_images [flag], -sprite_format [flag]\n");
+        std::printf("\nVersion: %s\n", version);
         std::printf("\n");
 
         return 1;
