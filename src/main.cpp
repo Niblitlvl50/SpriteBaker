@@ -281,6 +281,12 @@ void WriteImage(const std::vector<ImageData>& images, const std::vector<stbrp_re
 
 void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& context)
 {
+    struct RectId_Suffix
+    {
+        size_t rect_id;
+        std::string name_suffix;
+    };
+
     std::string output_folder;
 
     const size_t slash_pos = context.output_file.find_last_of('/');
@@ -288,7 +294,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         output_folder = context.output_file.substr(0, slash_pos +1);
 
     const std::regex filename_matcher("(.+\\/)?(\\S*?)([\\d]+)?\\.");
-    std::unordered_map<std::string, std::vector<size_t>> sprite_files;
+    std::unordered_map<std::string, std::vector<RectId_Suffix>> sprite_files;
 
     for(size_t index = 0; index < context.input_files.size(); ++index)
     {
@@ -300,14 +306,18 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
         //const std::string& folder_capture = match_result[1];
         const std::string& filename_capture = match_result[2];
-        //const std::string& integer_capture = match_result[3];
+        const std::string& integer_capture = match_result[3];
         //std::printf("Folder: %s, file: %s, int: %s\n",
         //    folder_capture.c_str(),
         //    filename_capture.c_str(),
         //    integer_capture.c_str());
 
-        std::vector<size_t>& frame_ids = sprite_files[filename_capture];
-        frame_ids.push_back(index);
+        RectId_Suffix id_suffix;
+        id_suffix.rect_id = index;
+        id_suffix.name_suffix = integer_capture;
+
+        std::vector<RectId_Suffix>& frame_ids = sprite_files[filename_capture];
+        frame_ids.push_back(id_suffix);
     }
 
     for(const auto& pair : sprite_files)
@@ -317,12 +327,12 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         json["texture"] = context.output_file;
         nlohmann::json& frames = json["frames"];
 
-        for(size_t frame_index : pair.second)
+        for(const RectId_Suffix& frame_index : pair.second)
         {
-            const stbrp_rect& rect = rects[frame_index];
+            const stbrp_rect& rect = rects[frame_index.rect_id];
 
             nlohmann::json object;
-            object["name"] = pair.first;
+            object["name"] = pair.first + frame_index.name_suffix;
             object["x"] = rect.x;
             object["y"] = rect.y;
             object["w"] = rect.w;
