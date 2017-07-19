@@ -17,7 +17,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.2.0";
+constexpr const char* version = "1.2.1";
 
 struct Context
 {
@@ -340,7 +340,9 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         {
             std::ifstream input_stream(sprite_file);
             const nlohmann::json& parsed_sprite_file = nlohmann::json::parse(input_stream);
-            animations = parsed_sprite_file["animations"];
+            auto anim_it = parsed_sprite_file.find("animations");
+            if(anim_it != parsed_sprite_file.end() && anim_it->is_array())
+                animations = *anim_it;
         }
         catch(const std::exception& error)
         { 
