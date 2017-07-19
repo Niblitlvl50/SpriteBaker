@@ -17,7 +17,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.1.1";
+constexpr const char* version = "1.2.0";
 
 struct Context
 {
@@ -233,8 +233,8 @@ std::vector<stbrp_rect> PackImages(const std::vector<ImageData>& images, int wid
     {
         rect.x += padding;
         rect.y += padding;
-        rect.w -= padding;
-        rect.h -= padding;
+        rect.w -= (padding * 2);
+        rect.h -= (padding * 2);
     }
 
     return pack_rects;
@@ -322,10 +322,32 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
     for(const auto& pair : sprite_files)
     {
-        nlohmann::json json;
+        const std::string& sprite_file = output_folder + pair.first + ".sprite";
 
-        json["texture"] = context.output_file;
-        nlohmann::json& frames = json["frames"];
+        nlohmann::json default_frames;
+        default_frames.push_back(0);
+        default_frames.push_back(-50);
+        
+        nlohmann::json default_animation;
+        default_animation["name"] = "default";
+        default_animation["loop"] = true;
+        default_animation["frames"] = default_frames;
+
+        nlohmann::json animations;
+        animations.push_back(default_animation);
+
+        try
+        {
+            std::ifstream input_stream(sprite_file);
+            const nlohmann::json& parsed_sprite_file = nlohmann::json::parse(input_stream);
+            animations = parsed_sprite_file["animations"];
+        }
+        catch(const std::exception& error)
+        { 
+            std::printf("%s\n", error.what());
+        }
+
+        nlohmann::json frames;
 
         for(const RectId_Suffix& frame_index : pair.second)
         {
@@ -340,10 +362,14 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
             frames.push_back(object);
         }
 
-        const std::string& sprite_file = output_folder + pair.first + ".sprite";
         std::ofstream out_file(sprite_file);
         if(!out_file)
             throw std::runtime_error("Unable to write to '" + sprite_file + "'");
+
+        nlohmann::json json;
+        json["texture"] = context.output_file;
+        json["animations"] = animations;
+        json["frames"] = frames;
 
         out_file << std::setw(4) << json << std::endl;
     }
