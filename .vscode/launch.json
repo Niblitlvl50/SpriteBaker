@@ -6,16 +6,18 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/bin/spritebaker",
-            "args": [
+            "args": [    
                 "-width", "512",
                 "-height", "512",
+                "-padding", "4",
                 "-bg_color", "255 0 255 255",
                 "-trim_images",
-                "-input", "res/cat-walk1.png res/cat-walk2.png",
-                "-output", "packed_image.png"
-                ],
+                "-sprite_format",
+                "-input", "res/cat-bump.png res/cat-jump1.png res/cat-jump2.png res/cat-jump3.png res/cat-stand1.png res/cat-stand2.png res/cat-turn1.png res/cat-walk1.png res/cat-walk2.png",
+                "-output", "res/baked_image.png"                
+            ],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}/res",
+            "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": false,
             "linux": {
