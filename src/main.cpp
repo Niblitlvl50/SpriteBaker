@@ -35,6 +35,7 @@ struct Context
     unsigned char background_a = 0;
     bool trim_images = false;
     bool write_sprite_format = false;
+    std::string sprite_folder;
 };
 
 struct ImageData
@@ -116,6 +117,9 @@ void ParseArguments(int argv, const char** argc, Context& context)
 
     context.trim_images = (options_table.find("trim_images") != end);
     context.write_sprite_format = (options_table.find("sprite_format") != end);
+    const auto sprite_folder_it = options_table.find("sprite_folder");
+    if(sprite_folder_it != options_table.end())
+        context.sprite_folder = sprite_folder_it->second;
 }
 
 void TrimImage(ImageData& image)
@@ -322,7 +326,8 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
     for(const auto& pair : sprite_files)
     {
-        const std::string& sprite_file = output_folder + pair.first + ".sprite";
+        const std::string& sprite_file =
+            (context.sprite_folder.empty() ? output_folder : context.sprite_folder) + pair.first + ".sprite";
 
         nlohmann::json default_frames;
         default_frames.push_back(0);
@@ -348,6 +353,8 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         { 
             std::printf("%s\n", error.what());
         }
+        catch(...)
+        { }
 
         nlohmann::json frames;
 
