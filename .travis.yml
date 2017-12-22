@@ -6,6 +6,9 @@ matrix:
   - os: linux
     compiler: gcc
     env: COMPILER=g++-4.9
+    addons:
+      apt:
+        packages: ['g++-4.9']
 
   - os: linux
     compiler: clang
