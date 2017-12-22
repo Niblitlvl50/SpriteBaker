@@ -486,7 +486,7 @@ int main(int argv, const char* argc[])
     for(const std::string& file : context.input_files)
         std::printf("\t'%s'\n", file.c_str());
     
-    std::printf("to '%s' during %lld ms\n", context.output_file.c_str(), ms.count());
+    std::printf("to '%s' during %ld ms\n", context.output_file.c_str(), ms.count());
 
     return 0;
 }

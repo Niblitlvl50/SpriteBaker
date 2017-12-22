@@ -1,8 +1,15 @@
 language: cpp
+
+matrix:
+  include:
+
+  - os: linux
+    compiler: gcc
+    env: COMPILER=g++-4.9
+
+  - os: linux
+    compiler: clang
+
 script:
   - cmake .
   - make
-
-compiler:
-  - clang
-  - gcc
