@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Niblitlvl50/SpriteBaker.svg?branch=master)](https://travis-ci.org/Niblitlvl50/SpriteBaker)
+
 # Sprite Baker
 
 A simple tool for baking a bunch of images into one larger image. Will write a sprite atlas and a json file that tells you where the sub images are. 
