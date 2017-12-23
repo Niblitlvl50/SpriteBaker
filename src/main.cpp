@@ -163,6 +163,7 @@ void TrimImage(ImageData& image)
     ImageData trimmed_image;
     trimmed_image.width = bytes_to_copy / 4;
     trimmed_image.height = image.height - top_rows_to_delete - bottom_rows_to_delete;
+    trimmed_image.color_components = image.color_components;
     trimmed_image.data.resize(trimmed_image.width * trimmed_image.height * 4);
 
     for(size_t row = 0; row < size_t(trimmed_image.height); ++row)
