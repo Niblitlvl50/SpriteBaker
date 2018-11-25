@@ -17,7 +17,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.3.0";
+constexpr const char* version = "1.4.0";
 
 struct Context
 {
@@ -369,6 +369,8 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
             object["y"] = rect.y;
             object["w"] = rect.w;
             object["h"] = rect.h;
+            object["x_offset"] = 0.0f;
+            object["y_offset"] = 0.0f;
             frames.push_back(object);
         }
 
@@ -487,7 +489,7 @@ int main(int argv, const char* argc[])
     for(const std::string& file : context.input_files)
         std::printf("\t'%s'\n", file.c_str());
     
-    std::printf("to '%s' during %ld ms\n", context.output_file.c_str(), ms.count());
+    std::printf("to '%s' during %lld ms\n", context.output_file.c_str(), ms.count());
 
     return 0;
 }
