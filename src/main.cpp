@@ -17,7 +17,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.4.0";
+constexpr const char* version = "1.5.0";
 
 struct Context
 {
@@ -378,8 +378,13 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         if(!out_file)
             throw std::runtime_error("Unable to write to '" + sprite_file + "'");
 
+        nlohmann::json texture_size;
+        texture_size["w"] = context.output_width;
+        texture_size["h"] = context.output_height;
+
         nlohmann::json json;
         json["texture"] = context.output_file;
+        json["texture_size"] = texture_size;
         json["animations"] = animations;
         json["frames"] = frames;
 
