@@ -35,6 +35,15 @@
             "problemMatcher": []
         },
         {
+            "taskName": "deploy",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "scripts/deploy.py"
+            ],
+            "problemMatcher": []
+        },
+        {
             "taskName": "run",
             "type": "process",
             "group": {

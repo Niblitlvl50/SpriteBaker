@@ -17,7 +17,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.5.0";
+constexpr const char* version = "1.6.0";
 
 struct Context
 {
@@ -325,10 +325,13 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         frame_ids.push_back(id_suffix);
     }
 
+    const std::string real_output_folder = (context.sprite_folder.empty() ? output_folder : context.sprite_folder);
+
+    nlohmann::json all_sprite_files;
+
     for(const auto& pair : sprite_files)
     {
-        const std::string& sprite_file =
-            (context.sprite_folder.empty() ? output_folder : context.sprite_folder) + pair.first + ".sprite";
+        const std::string& sprite_file = real_output_folder + pair.first + ".sprite";
 
         nlohmann::json default_frames;
         default_frames.push_back(0);
@@ -389,7 +392,15 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         json["frames"] = frames;
 
         out_file << std::setw(4) << json << std::endl;
+        all_sprite_files.push_back(sprite_file);
     }
+
+    nlohmann::json all_sprite_files_json;
+    all_sprite_files_json["all_sprites"] = all_sprite_files;
+
+    std::ofstream out_all_file(real_output_folder + "all_sprite_files.json");
+    out_all_file << std::setw(4) << all_sprite_files_json << std::endl;
+
 }
 
 void WriteGenericJson(const std::vector<stbrp_rect>& rects, const Context& context)
