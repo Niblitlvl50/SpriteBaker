@@ -395,12 +395,13 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         all_sprite_files.push_back(sprite_file);
     }
 
+    std::sort(all_sprite_files.begin(), all_sprite_files.end());
+
     nlohmann::json all_sprite_files_json;
     all_sprite_files_json["all_sprites"] = all_sprite_files;
 
     std::ofstream out_all_file(real_output_folder + "all_sprite_files.json");
     out_all_file << std::setw(4) << all_sprite_files_json << std::endl;
-
 }
 
 void WriteGenericJson(const std::vector<stbrp_rect>& rects, const Context& context)
