@@ -1,26 +1,21 @@
 
 language: cpp
 sudo: required
-dist: trusty
+dist: bionic
 
 matrix:
   include:
 
   - os: linux
     compiler: gcc
-    env: COMPILER=g++-4.9
-    addons:
-      apt:
-        sources: 
-          - ubuntu-toolchain-r-test
-        packages:
-          - g++-4.9
 
   - os: linux
     compiler: clang
 
   - os: osx
-    osx_image: xcode9
+    compiler: clang
+    osx_image: xcode11.3
+
 
 script:
 
