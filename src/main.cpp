@@ -1,9 +1,11 @@
 
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STB_RECT_PACK_IMPLEMENTATION
 
 #include "stb_image.h"
+#include "stb_image_resize.h"
 #include "stb_image_write.h"
 #include "stb_rect_pack.h"
 
@@ -14,6 +16,7 @@
 #include <unordered_map>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 #include <regex>
 #include <limits>
 #include <chrono>
@@ -29,6 +32,7 @@ struct Context
     int output_height;
 
     // Optional arguments
+    int scale_in_percentage = 100;
     int padding = 0;
     unsigned char background_r = 0;
     unsigned char background_g = 0;
@@ -99,6 +103,10 @@ void ParseArguments(int argv, const char** argc, Context& context)
     std::istringstream input_stream(input_it->second);
     while(input_stream >> temp)
         context.input_files.push_back(temp);
+
+    const auto scale_argument = options_table.find("scale");
+    if(scale_argument != options_table.end())
+        context.scale_in_percentage = std::stoi(scale_argument->second);
 
     const auto padding_it = options_table.find("padding");
     if(padding_it != options_table.end())
@@ -179,7 +187,27 @@ void TrimImage(ImageData& image)
     image = std::move(trimmed_image);
 }
 
-std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files, bool trim_images)
+void ScaleImage(ImageData& image, int scale_percentage)
+{
+    const float float_scale = float(scale_percentage) / 100.0f;
+
+    ImageData scaled_image;
+    scaled_image.width = image.width * float_scale;
+    scaled_image.height = image.height * float_scale;
+    scaled_image.color_components = image.color_components;
+    scaled_image.data.resize(scaled_image.width * scaled_image.height * image.color_components);
+
+    const int result = stbir_resize_uint8(
+        image.data.data(), image.width, image.height, 0,
+        scaled_image.data.data(), scaled_image.width, scaled_image.height, 0, image.color_components);
+
+    if(result == 0)
+        throw std::runtime_error("Failed to scale image");
+
+    image = std::move(scaled_image);
+}
+
+std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files, bool trim_images, int scale_percentage)
 {
     std::vector<ImageData> images;
     images.reserve(image_files.size());
@@ -197,6 +225,9 @@ std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files, b
         const int image_size = image.width * image.height * color_components;
         image.data.resize(image_size);
         std::memcpy(image.data.data(), data, image_size);
+
+        if(scale_percentage != 100)
+            ScaleImage(image, scale_percentage);
 
         if(trim_images)
             TrimImage(image);
@@ -475,7 +506,7 @@ int main(int argv, const char* argc[])
     try
     {
         ParseArguments(argv, argc, context);
-        const std::vector<ImageData>& images = LoadImages(context.input_files, context.trim_images);
+        const std::vector<ImageData>& images = LoadImages(context.input_files, context.trim_images, context.scale_in_percentage);
         const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height, context.padding);
         WriteImage(images, rects, context);
         
