@@ -21,7 +21,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.6.1";
+constexpr const char* version = "1.7.0";
 
 struct Context
 {
@@ -524,7 +524,7 @@ int main(int argv, const char* argc[])
         std::printf("\t-width, -height, -input, -output\n");
         std::printf("\n");
         std::printf("Optional arguments:\n");
-        std::printf("\t-bg_color [r g b a, 0 - 255], -padding [>= 0], -trim_images [flag], -sprite_format [flag]\n");
+        std::printf("\t-bg_color [r g b a, 0 - 255], -padding [>= 0], -scale [percentage] -trim_images [flag], -sprite_format [flag]\n");
         std::printf("\nVersion: %s\n", version);
         std::printf("\n");
 
