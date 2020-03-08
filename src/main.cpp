@@ -503,7 +503,7 @@ int main(int argv, const char* argc[])
     const auto& time_diff = std::chrono::system_clock::now() - start_time;
     const auto& ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_diff);
 
-    std::printf("Successfully baked\n");
+    std::printf("Successfully baked [version: %s]\n", version);
     for(const std::string& file : context.input_files)
         std::printf("\t'%s'\n", file.c_str());
     
