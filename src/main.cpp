@@ -13,11 +13,12 @@
 #include <string>
 #include <unordered_map>
 #include <fstream>
+#include <sstream>
 #include <regex>
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.6.0";
+constexpr const char* version = "1.6.1";
 
 struct Context
 {
@@ -188,7 +189,7 @@ std::vector<ImageData> LoadImages(const std::vector<std::string>& image_files, b
         ImageData image;
 
         // Force to 4 color components (RGBA).
-        constexpr int color_components = 4;
+        constexpr int color_components = STBI_rgb_alpha;
         stbi_uc* data = stbi_load(file.c_str(), &image.width, &image.height, &image.color_components, color_components);
         if(!data)
             throw std::runtime_error(stbi_failure_reason() + std::string(" '") + file + "'");
