@@ -468,8 +468,8 @@ void WriteGenericJson(const std::vector<stbrp_rect>& rects, const Context& conte
         object["trimmed"] = context.trim_images;
         object["frame"] = frame;
         object["pivot"] = pivot;
-        object["sourceSize"] = source_size;
-        object["spriteSourceSize"] = sprite_source_size;
+        object["source_size"] = source_size;
+        object["sprite_source_size"] = sprite_source_size;
 
         frames.push_back(object);
     }
@@ -480,7 +480,7 @@ void WriteGenericJson(const std::vector<stbrp_rect>& rects, const Context& conte
 
     nlohmann::json meta;
     meta["app"]     = "https://github.com/Niblitlvl50/SpriteBaker";
-    meta["version"] = "1.0";
+    meta["version"] = version;
     meta["image"]   = context.output_file;
     meta["format"]  = "RGBA8888";
     meta["size"]    = output_size;
