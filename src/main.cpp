@@ -21,7 +21,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.7.0";
+constexpr const char* version = "1.8.0";
 
 struct Context
 {
@@ -324,6 +324,12 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         std::string name_suffix;
     };
 
+    struct SpriteMetadata
+    {
+        std::string category;
+        std::vector<RectId_Suffix> rect_and_suffixes;
+    };
+
     std::string output_folder;
 
     const size_t slash_pos = context.output_file.find_last_of('/');
@@ -331,7 +337,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         output_folder = context.output_file.substr(0, slash_pos +1);
 
     const std::regex filename_matcher("(.+\\/)?(\\S*?)([\\d]+)?\\.");
-    std::unordered_map<std::string, std::vector<RectId_Suffix>> sprite_files;
+    std::unordered_map<std::string, SpriteMetadata> sprite_files;
 
     for(size_t index = 0; index < context.input_files.size(); ++index)
     {
@@ -341,7 +347,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         if(!std::regex_search(file, match_result, filename_matcher))
             continue;
 
-        //const std::string& folder_capture = match_result[1];
+        std::string folder_capture = match_result[1];
         const std::string& filename_capture = match_result[2];
         const std::string& integer_capture = match_result[3];
         //std::printf("Folder: %s, file: %s, int: %s\n",
@@ -349,12 +355,16 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         //    filename_capture.c_str(),
         //    integer_capture.c_str());
 
+        folder_capture.pop_back();
+        const size_t slash_pos = folder_capture.find_last_of('/');
+
         RectId_Suffix id_suffix;
         id_suffix.rect_id = index;
         id_suffix.name_suffix = integer_capture;
 
-        std::vector<RectId_Suffix>& frame_ids = sprite_files[filename_capture];
-        frame_ids.push_back(id_suffix);
+        SpriteMetadata& metadata = sprite_files[filename_capture];
+        metadata.category = folder_capture.substr(slash_pos + 1);
+        metadata.rect_and_suffixes.push_back(id_suffix);
     }
 
     const std::string real_output_folder = (context.sprite_folder.empty() ? output_folder : context.sprite_folder);
@@ -394,7 +404,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
         nlohmann::json frames;
 
-        for(const RectId_Suffix& frame_index : pair.second)
+        for(const RectId_Suffix& frame_index : pair.second.rect_and_suffixes)
         {
             const stbrp_rect& rect = rects[frame_index.rect_id];
 
@@ -419,6 +429,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
         nlohmann::json json;
         json["texture"] = context.output_file;
+        json["category"] = pair.second.category;
         json["texture_size"] = texture_size;
         json["animations"] = animations;
         json["frames"] = frames;
