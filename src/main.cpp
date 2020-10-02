@@ -21,7 +21,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.8.0";
+constexpr const char* version = "1.9.0";
 
 struct Context
 {
@@ -321,7 +321,8 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
     struct RectId_Suffix
     {
         size_t rect_id;
-        std::string name_suffix;
+        std::string animation_name;
+        int image_index;
     };
 
     struct SpriteMetadata
@@ -336,7 +337,11 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
     if(slash_pos != std::string::npos)
         output_folder = context.output_file.substr(0, slash_pos +1);
 
-    const std::regex filename_matcher("(.+\\/)?(\\S*?)([\\d]+)?\\.");
+    const std::string real_output_folder = (context.sprite_folder.empty() ? output_folder : context.sprite_folder);
+
+    // (.+\/)?(\S*?)(\[\S*\])?([\d]+)?\.
+    const std::regex filename_matcher("(.+\\/)?(\\S*?)(\\[\\S*\\])?([\\d]+)?\\.");
+
     std::unordered_map<std::string, SpriteMetadata> sprite_files;
 
     for(size_t index = 0; index < context.input_files.size(); ++index)
@@ -349,43 +354,95 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
         std::string folder_capture = match_result[1];
         const std::string& filename_capture = match_result[2];
-        const std::string& integer_capture = match_result[3];
-        //std::printf("Folder: %s, file: %s, int: %s\n",
-        //    folder_capture.c_str(),
-        //    filename_capture.c_str(),
-        //    integer_capture.c_str());
+        std::string animation_name_capture = match_result[3];
+        const std::string& integer_capture = match_result[4];
+        const int image_index = integer_capture.empty() ? -1 : std::stoi(integer_capture);
+        // std::printf("Folder: %s, file: %s, anim_name: %s, int: %s\n",
+        //     folder_capture.c_str(),
+        //     filename_capture.c_str(),
+        //     animation_name_capture.c_str(),
+        //     integer_capture.c_str());
 
         folder_capture.pop_back();
         const size_t slash_pos = folder_capture.find_last_of('/');
+        folder_capture = folder_capture.substr(slash_pos + 1); // The last folder is the category
+
+        // The capture contains '[ ... ]', so get rid of the first and last char.
+        if(!animation_name_capture.empty())
+            animation_name_capture = animation_name_capture.substr(1, animation_name_capture.size() -2);
 
         RectId_Suffix id_suffix;
         id_suffix.rect_id = index;
-        id_suffix.name_suffix = integer_capture;
+        id_suffix.animation_name = animation_name_capture;
+        id_suffix.image_index = image_index;
 
         SpriteMetadata& metadata = sprite_files[filename_capture];
-        metadata.category = folder_capture.substr(slash_pos + 1);
+        metadata.category = folder_capture;
         metadata.rect_and_suffixes.push_back(id_suffix);
     }
 
-    const std::string real_output_folder = (context.sprite_folder.empty() ? output_folder : context.sprite_folder);
-
     nlohmann::json all_sprite_files;
 
-    for(const auto& pair : sprite_files)
+    for(const auto& file_metadata : sprite_files)
     {
-        const std::string& sprite_file = real_output_folder + pair.first + ".sprite";
+        const std::string& sprite_name = file_metadata.first;
+        SpriteMetadata sprite_metadata = file_metadata.second;
 
-        nlohmann::json default_frames;
-        default_frames.push_back(0);
-        default_frames.push_back(-50);
+        const auto by_name_index = [](const RectId_Suffix& first, const RectId_Suffix& second) {
+            if(first.animation_name == second.animation_name)
+                return first.image_index < second.image_index;
+
+            return first.animation_name < second.animation_name;
+        };
+        std::sort(sprite_metadata.rect_and_suffixes.begin(), sprite_metadata.rect_and_suffixes.end(), by_name_index);
         
-        nlohmann::json default_animation;
-        default_animation["name"] = "default";
-        default_animation["loop"] = true;
-        default_animation["frames"] = default_frames;
+        const std::string& sprite_file = real_output_folder + sprite_name + ".sprite";
+
+        nlohmann::json frames;
+        std::map<std::string, std::vector<int>> generated_animations;
+
+        for(size_t index = 0; index < sprite_metadata.rect_and_suffixes.size(); ++index)
+        {
+            const RectId_Suffix& frame_index = sprite_metadata.rect_and_suffixes[index];
+            const stbrp_rect& rect = rects[frame_index.rect_id];
+
+            nlohmann::json object;
+            object["name"] = sprite_name + "_" + frame_index.animation_name + "_" + std::to_string(frame_index.image_index);
+            object["x"] = rect.x;
+            object["y"] = rect.y;
+            object["w"] = rect.w;
+            object["h"] = rect.h;
+            object["x_offset"] = 0.0f;
+            object["y_offset"] = 0.0f;
+
+            frames.push_back(object);
+
+            if(!frame_index.animation_name.empty())
+            {
+                std::vector<int>& animation_data = generated_animations[frame_index.animation_name];
+                animation_data.push_back(index);
+                animation_data.push_back(100);
+            }
+        }
+
+        if(generated_animations.empty())
+        {
+            std::vector<int>& animation_data = generated_animations["default"];
+            animation_data.push_back(0);
+            animation_data.push_back(-50);
+        }
 
         nlohmann::json animations;
-        animations.push_back(default_animation);
+
+        for(const auto& name_frames : generated_animations)
+        {
+            nlohmann::json json_animation;
+            json_animation["name"] = name_frames.first;
+            json_animation["frames"] = name_frames.second;
+            json_animation["loop"] = true;
+    
+            animations.push_back(json_animation);
+        }
 
         try
         {
@@ -400,23 +457,8 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
             std::printf("%s\n", error.what());
         }
         catch(...)
-        { }
-
-        nlohmann::json frames;
-
-        for(const RectId_Suffix& frame_index : pair.second.rect_and_suffixes)
         {
-            const stbrp_rect& rect = rects[frame_index.rect_id];
-
-            nlohmann::json object;
-            object["name"] = pair.first + frame_index.name_suffix;
-            object["x"] = rect.x;
-            object["y"] = rect.y;
-            object["w"] = rect.w;
-            object["h"] = rect.h;
-            object["x_offset"] = 0.0f;
-            object["y_offset"] = 0.0f;
-            frames.push_back(object);
+            std::printf("Unknown error when trying to read sprite file '%s'\n", sprite_file.c_str());
         }
 
         std::ofstream out_file(sprite_file);
@@ -429,10 +471,10 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
         nlohmann::json json;
         json["texture"] = context.output_file;
-        json["category"] = pair.second.category;
+        json["category"] = sprite_metadata.category;
         json["texture_size"] = texture_size;
-        json["animations"] = animations;
         json["frames"] = frames;
+        json["animations"] = animations;
 
         out_file << std::setw(4) << json << std::endl;
         all_sprite_files.push_back(sprite_file);
