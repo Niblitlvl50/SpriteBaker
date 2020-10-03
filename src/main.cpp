@@ -21,7 +21,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.9.0";
+constexpr const char* version = "1.9.1";
 
 struct Context
 {
@@ -406,8 +406,14 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
             const RectId_Suffix& frame_index = sprite_metadata.rect_and_suffixes[index];
             const stbrp_rect& rect = rects[frame_index.rect_id];
 
+            std::string sprite_frame_name = sprite_name;
+            if(!frame_index.animation_name.empty())
+                sprite_frame_name += "_" + frame_index.animation_name;
+            if(frame_index.image_index >= 0)
+                sprite_frame_name += "_" + std::to_string(frame_index.image_index);
+
             nlohmann::json object;
-            object["name"] = sprite_name + "_" + frame_index.animation_name + "_" + std::to_string(frame_index.image_index);
+            object["name"] = sprite_frame_name;
             object["x"] = rect.x;
             object["y"] = rect.y;
             object["w"] = rect.w;
@@ -447,10 +453,13 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         try
         {
             std::ifstream input_stream(sprite_file);
-            const nlohmann::json& parsed_sprite_file = nlohmann::json::parse(input_stream);
-            auto anim_it = parsed_sprite_file.find("animations");
-            if(anim_it != parsed_sprite_file.end() && anim_it->is_array())
-                animations = *anim_it;
+            if(input_stream.good())
+            {
+                const nlohmann::json& parsed_sprite_file = nlohmann::json::parse(input_stream);
+                auto anim_it = parsed_sprite_file.find("animations");
+                if(anim_it != parsed_sprite_file.end() && anim_it->is_array())
+                    animations = *anim_it;
+            }
         }
         catch(const std::exception& error)
         { 
