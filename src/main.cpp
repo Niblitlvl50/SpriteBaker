@@ -21,7 +21,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "1.9.1";
+constexpr const char* version = "2.0.0";
 
 struct Context
 {
@@ -399,6 +399,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         const std::string& sprite_file = real_output_folder + sprite_name + ".sprite";
 
         nlohmann::json frames;
+        nlohmann::json frames_offsets;
         std::map<std::string, std::vector<int>> generated_animations;
 
         for(size_t index = 0; index < sprite_metadata.rect_and_suffixes.size(); ++index)
@@ -418,16 +419,18 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
             object["y"] = rect.y;
             object["w"] = rect.w;
             object["h"] = rect.h;
-            object["x_offset"] = 0.0f;
-            object["y_offset"] = 0.0f;
 
             frames.push_back(object);
+
+            nlohmann::json offset_object;
+            offset_object["x"] = 0.0f;
+            offset_object["y"] = 0.0f;
+            frames_offsets.push_back(offset_object);
 
             if(!frame_index.animation_name.empty())
             {
                 std::vector<int>& animation_data = generated_animations[frame_index.animation_name];
                 animation_data.push_back(index);
-                animation_data.push_back(100);
             }
         }
 
@@ -435,7 +438,6 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         {
             std::vector<int>& animation_data = generated_animations["default"];
             animation_data.push_back(0);
-            animation_data.push_back(-50);
         }
 
         nlohmann::json animations;
@@ -444,8 +446,9 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         {
             nlohmann::json json_animation;
             json_animation["name"] = name_frames.first;
-            json_animation["frames"] = name_frames.second;
             json_animation["loop"] = true;
+            json_animation["frame_duration"] = 100;
+            json_animation["frames"] = name_frames.second;
     
             animations.push_back(json_animation);
         }
@@ -456,9 +459,14 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
             if(input_stream.good())
             {
                 const nlohmann::json& parsed_sprite_file = nlohmann::json::parse(input_stream);
-                auto anim_it = parsed_sprite_file.find("animations");
+
+                const auto anim_it = parsed_sprite_file.find("animations");
                 if(anim_it != parsed_sprite_file.end() && anim_it->is_array())
                     animations = *anim_it;
+                
+                const auto frames_offsets_it = parsed_sprite_file.find("frames_offsets");
+                if(frames_offsets_it != parsed_sprite_file.end() && frames_offsets_it->is_array())
+                    frames_offsets = *frames_offsets_it;
             }
         }
         catch(const std::exception& error)
@@ -483,6 +491,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         json["category"] = sprite_metadata.category;
         json["texture_size"] = texture_size;
         json["frames"] = frames;
+        json["frames_offsets"] = frames_offsets;
         json["animations"] = animations;
 
         out_file << std::setw(4) << json << std::endl;
