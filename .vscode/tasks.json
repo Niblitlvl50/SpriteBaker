@@ -4,12 +4,15 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "build",
+            "label": "build",
             "command": "make",
+            "type": "process",
             "args": [
                 "-j8"
             ],
-            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -17,20 +20,26 @@
             "problemMatcher": []
         },
         {
-            "taskName": "clean",
+            "label": "clean",
             "command": "make",
             "args": [
                 "clean"
             ],
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
             "type": "process",
             "problemMatcher": []
         },
         {
-            "taskName": "cmake",
+            "label": "cmake",
             "command": "cmake",
             "args": [
-                "."
+                "../"
             ],
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
             "type": "process",
             "problemMatcher": []
         },
