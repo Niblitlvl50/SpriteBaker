@@ -21,7 +21,7 @@
 #include <limits>
 #include <chrono>
 
-constexpr const char* version = "2.0.0";
+constexpr const char* version = "3.0.0";
 
 struct Context
 {
@@ -327,7 +327,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
     struct SpriteMetadata
     {
-        std::string category;
+        std::string source_folder;
         std::vector<RectId_Suffix> rect_and_suffixes;
     };
 
@@ -363,9 +363,9 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         //     animation_name_capture.c_str(),
         //     integer_capture.c_str());
 
-        folder_capture.pop_back();
-        const size_t slash_pos = folder_capture.find_last_of('/');
-        folder_capture = folder_capture.substr(slash_pos + 1); // The last folder is the category
+        //folder_capture.pop_back();
+        //const size_t slash_pos = folder_capture.find_last_of('/');
+        //folder_capture = folder_capture.substr(slash_pos + 1); // The last folder is the category
 
         // The capture contains '[ ... ]', so get rid of the first and last char.
         if(!animation_name_capture.empty())
@@ -377,7 +377,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         id_suffix.image_index = image_index;
 
         SpriteMetadata& metadata = sprite_files[filename_capture];
-        metadata.category = folder_capture;
+        metadata.source_folder = folder_capture;
         metadata.rect_and_suffixes.push_back(id_suffix);
     }
 
@@ -488,7 +488,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
         nlohmann::json json;
         json["texture"] = context.output_file;
-        json["category"] = sprite_metadata.category;
+        json["source_folder"] = sprite_metadata.source_folder;
         json["texture_size"] = texture_size;
         json["frames"] = frames;
         json["frames_offsets"] = frames_offsets;
