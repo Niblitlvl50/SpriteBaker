@@ -353,7 +353,7 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
             continue;
 
         std::string folder_capture = match_result[1];
-        const std::string& filename_capture = match_result[2];
+        std::string filename_capture = match_result[2];
         std::string animation_name_capture = match_result[3];
         const std::string& integer_capture = match_result[4];
         const int image_index = integer_capture.empty() ? -1 : std::stoi(integer_capture);
@@ -368,7 +368,9 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
         //folder_capture = folder_capture.substr(slash_pos + 1); // The last folder is the category
 
         // The capture contains '[ ... ]', so get rid of the first and last char.
-        if(!animation_name_capture.empty())
+        if(animation_name_capture.empty())
+            filename_capture += integer_capture;
+        else
             animation_name_capture = animation_name_capture.substr(1, animation_name_capture.size() -2);
 
         RectId_Suffix id_suffix;
@@ -409,9 +411,11 @@ void WriteSpriteFiles(const std::vector<stbrp_rect>& rects, const Context& conte
 
             std::string sprite_frame_name = sprite_name;
             if(!frame_index.animation_name.empty())
+            {
                 sprite_frame_name += "_" + frame_index.animation_name;
-            if(frame_index.image_index >= 0)
-                sprite_frame_name += "_" + std::to_string(frame_index.image_index);
+                if(frame_index.image_index >= 0)
+                    sprite_frame_name += "_" + std::to_string(frame_index.image_index);
+            }
 
             nlohmann::json object;
             object["name"] = sprite_frame_name;
