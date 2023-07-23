@@ -20,6 +20,7 @@
 #include <regex>
 #include <limits>
 #include <chrono>
+#include <filesystem>
 
 constexpr const char* version = "3.0.0";
 
@@ -99,10 +100,26 @@ void ParseArguments(int argv, const char** argc, Context& context)
     context.output_height = std::stoi(height_it->second);
     context.output_file = output_it->second;
 
-    std::string temp;
-    std::istringstream input_stream(input_it->second);
-    while(input_stream >> temp)
-        context.input_files.push_back(temp);
+    {
+        const bool is_file = std::filesystem::is_regular_file(input_it->second);
+        if(is_file)
+        {
+            std::string temp;
+            std::ifstream input_stream(input_it->second);
+            while(input_stream >> temp)
+            {
+                std::replace(temp.begin(), temp.end(), '\\', '/');
+                context.input_files.push_back(temp);
+            }
+        }
+        else
+        {
+            std::string temp;
+            std::istringstream input_stream(input_it->second);
+            while(input_stream >> temp)
+                context.input_files.push_back(temp);
+        }
+    }
 
     const auto scale_argument = options_table.find("scale");
     if(scale_argument != options_table.end())
