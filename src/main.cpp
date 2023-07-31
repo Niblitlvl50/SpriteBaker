@@ -598,6 +598,8 @@ int main(int argv, const char* argc[])
     try
     {
         ParseArguments(argv, argc, context);
+        std::printf("Found '%u' input files.\n", context.input_files.size());
+
         const std::vector<ImageData>& images = LoadImages(context.input_files, context.trim_images, context.scale_in_percentage);
         const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height, context.padding);
         WriteImage(images, rects, context);
