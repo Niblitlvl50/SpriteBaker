@@ -598,7 +598,7 @@ int main(int argv, const char* argc[])
     try
     {
         ParseArguments(argv, argc, context);
-        std::printf("Found '%u' input files.\n", context.input_files.size());
+        std::printf("Found '%lu' input files.\n", context.input_files.size());
 
         const std::vector<ImageData>& images = LoadImages(context.input_files, context.trim_images, context.scale_in_percentage);
         const std::vector<stbrp_rect>& rects = PackImages(images, context.output_width, context.output_height, context.padding);
@@ -632,7 +632,7 @@ int main(int argv, const char* argc[])
     for(const std::string& file : context.input_files)
         std::printf("\t'%s'\n", file.c_str());
     
-    std::printf("to '%s' during %lld ms\n", context.output_file.c_str(), ms.count());
+    std::printf("to '%s' during %ld ms\n", context.output_file.c_str(), ms.count());
 
     return 0;
 }
